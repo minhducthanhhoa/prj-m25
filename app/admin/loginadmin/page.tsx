@@ -1,16 +1,18 @@
-import { useState } from 'react';
-import { useRouter } from 'next/router';
+"use client"; // Kích hoạt client-side rendering
 
-const Login = () => {
+import { useState } from 'react';
+import { useRouter } from 'next/navigation'; // Sử dụng từ next/navigation thay vì next/router trong app directory
+
+const LoginAdmin = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const router = useRouter();
+  const router = useRouter(); // Lấy router từ next/navigation
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (email === 'admin@rikkeiacademy.com' && password === 'password') {
       localStorage.setItem('user', JSON.stringify({ email }));
-      router.push('/');
+      router.push('/'); // Chuyển hướng đến trang chính
     } else {
       alert('Incorrect login details');
     }
@@ -48,4 +50,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LoginAdmin;
