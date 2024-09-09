@@ -1,8 +1,8 @@
 {
-  "admin":[
+  "admin": [
     {
       "email": "admin@gmail.com",
-      "password":"rikkeiacademy"
+      "password": "rikkeiacademy"
     }
   ],
   "users": [
@@ -50,6 +50,24 @@
       "name": "Ngô Minh Đức",
       "email": "admin@gmail.com",
       "isActive": false
+    }
+  ],
+  "categories": [
+    {
+      "id": 2,
+      "name": "iphone2"
+    },
+    {
+      "id": 2,
+      "name": "iphone"
+    },
+    {
+      "id": 3,
+      "name": "dddd3"
+    },
+    {
+      "id": 4,
+      "name": "iphone"
     }
   ]
 }

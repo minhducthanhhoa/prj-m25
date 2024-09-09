@@ -1,72 +1,80 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import fs from 'fs';
+import { NextRequest, NextResponse } from 'next/server';
+import { promises as fs } from 'fs';
 import path from 'path';
 
-interface Category {
-  id: number;
-  name: string;
-  type: string;
+// Đường dẫn đến file db.json
+const dbFilePath = path.join(process.cwd(), 'server/db.json');
+
+// Hàm đọc dữ liệu từ db.json
+async function readData() {
+  const jsonData = await fs.readFile(dbFilePath, 'utf8');
+  return JSON.parse(jsonData);
 }
 
-// Đường dẫn tới file db.json
-const dataPath = path.join(process.cwd(), 'data', 'server/db.json');
-
-function readData() {
-  const jsonData = fs.readFileSync(dataPath, 'utf8');
-  return JSON.parse(jsonData).categories as Category[];
+// Hàm ghi dữ liệu vào db.json
+async function writeData(data: any) {
+  await fs.writeFile(dbFilePath, JSON.stringify(data, null, 2), 'utf8');
 }
 
-function saveData(categories: Category[]) {
-  const dataToSave = JSON.stringify({ categories }, null, 2);
-  fs.writeFileSync(dataPath, dataToSave, 'utf8');
+// GET method to fetch categories
+export async function GET() {
+  const data = await readData();
+  const categories = data.categories || [];
+  return NextResponse.json(categories);
 }
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  const categories = readData();
+// POST method to add a new category
+export async function POST(req: NextRequest) {
+  const data = await readData();
+  const categories = data.categories || [];
+  const { name } = await req.json();
 
-  switch (req.method) {
-    case 'GET':
-      res.status(200).json(categories);
-      break;
-    case 'POST':
-      const { name, type } = req.body;
-      if (!name || !type) {
-        res.status(400).json({ error: 'Name and type are required' });
-        return;
-      }
-      const newCategory: Category = {
-        id: categories.length + 1, // simple auto-increment ID, not safe for production
-        name,
-        type,
-      };
-      categories.push(newCategory);
-      saveData(categories);
-      res.status(201).json(newCategory);
-      break;
-    case 'PUT':
-      const { id, newName, newType } = req.body;
-      const index = categories.findIndex(cat => cat.id === id);
-      if (index === -1) {
-        res.status(404).json({ error: 'Category not found' });
-        return;
-      }
-      categories[index].name = newName;
-      categories[index].type = newType;
-      saveData(categories);
-      res.status(200).json(categories[index]);
-      break;
-    case 'DELETE':
-      const { id: deleteId } = req.body;
-      const filteredCategories = categories.filter(cat => cat.id !== deleteId);
-      if (filteredCategories.length === categories.length) {
-        res.status(404).json({ error: 'Category not found' });
-        return;
-      }
-      saveData(filteredCategories);
-      res.status(200).json({ message: 'Category deleted successfully' });
-      break;
-    default:
-      res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
-      res.status(405).end(`Method ${req.method} Not Allowed`);
+  if (!name) {
+    return NextResponse.json({ message: 'Name is required' }, { status: 400 });
   }
+
+  const newCategory = { id: categories.length + 1, name };
+  categories.push(newCategory);
+  await writeData({ ...data, categories });
+
+  return NextResponse.json(newCategory, { status: 201 });
+}
+
+// PUT method to update a category
+export async function PUT(req: NextRequest) {
+  const data = await readData();
+  const categories = data.categories || [];
+  const { id, updatedName } = await req.json();
+
+  if (!id || !updatedName) {
+    return NextResponse.json({ message: 'ID and updatedName are required' }, { status: 400 });
+  }
+
+  const categoryIndex = categories.findIndex((cat: any) => cat.id === Number(id));
+  if (categoryIndex === -1) {
+    return NextResponse.json({ message: 'Category not found' }, { status: 404 });
+  }
+
+  categories[categoryIndex].name = updatedName;
+  await writeData({ ...data, categories });
+
+  return NextResponse.json(categories[categoryIndex], { status: 200 });
+}
+
+// DELETE method to remove a category
+export async function DELETE(req: NextRequest) {
+  const data = await readData();
+  const categories = data.categories || [];
+  const { id } = await req.json();
+
+  const deleteId = Number(id);
+  const deleteIndex = categories.findIndex((cat: any) => cat.id === deleteId);
+  if (deleteIndex === -1) {
+    return NextResponse.json({ message: 'Category not found' }, { status: 404 });
+  }
+
+  categories.splice(deleteIndex, 1);
+  await writeData({ ...data, categories });
+
+  return new NextResponse(null, { status: 204 });
 }
