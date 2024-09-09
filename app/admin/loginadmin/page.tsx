@@ -1,20 +1,37 @@
 "use client"; // Kích hoạt client-side rendering
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation'; // Sử dụng từ next/navigation thay vì next/router trong app directory
+import { useRouter } from 'next/navigation';
 
 const LoginAdmin = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const router = useRouter(); // Lấy router từ next/navigation
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (email === 'admin@rikkeiacademy.com' && password === 'password') {
-      localStorage.setItem('user', JSON.stringify({ email }));
-      router.push('/'); // Chuyển hướng đến trang chính
-    } else {
-      alert('Incorrect login details');
+    setErrorMessage(''); // Reset lỗi nếu có
+
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        localStorage.setItem('user', JSON.stringify({ email }));
+        router.push('/'); // Chuyển hướng đến trang chính
+      } else {
+        setErrorMessage(result.message);
+      }
+    } catch (error) {
+      setErrorMessage('Có lỗi xảy ra, vui lòng thử lại.');
     }
   };
 
@@ -42,6 +59,7 @@ const LoginAdmin = () => {
             required
           />
         </div>
+        {errorMessage && <p className="text-red-500 mb-4">{errorMessage}</p>}
         <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
           Login
         </button>

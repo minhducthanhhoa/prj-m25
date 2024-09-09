@@ -19,6 +19,7 @@ const Sidebar = () => {
         <a href="/admin/products" className="p-4 hover:bg-gray-700">Products</a>
         <a href="/admin/orders" className="p-4 hover:bg-gray-700">Orders</a>
         <a href="/admin/customers" className="p-4 hover:bg-gray-700">Customers</a>
+        <a href="/admin/categories" className="p-4 hover:bg-gray-700">Categories</a>
       </nav>
       <button onClick={handleLogout} className="p-4 mt-auto bg-red-600 hover:bg-red-700">Logout</button>
     </div>

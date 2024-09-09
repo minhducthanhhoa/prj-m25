@@ -1,0 +1,55 @@
+{
+  "admin":[
+    {
+      "email": "admin@gmail.com",
+      "password":"rikkeiacademy"
+    }
+  ],
+  "users": [
+    {
+      "id": 2,
+      "name": "User One",
+      "email": "user1@example.com"
+    },
+    {
+      "id": 3,
+      "name": "User Two",
+      "email": "user2@example.com"
+    },
+    {
+      "id": 4,
+      "name": "User Three",
+      "email": "user3@example.com"
+    },
+    {
+      "id": 5,
+      "name": "User Four",
+      "email": "user4@example.com"
+    },
+    {
+      "id": 6,
+      "name": "User Five",
+      "email": "user5@example.com"
+    },
+    {
+      "id": 7,
+      "email": "minhduc@gmail.com"
+    },
+    {
+      "id": 8,
+      "email": "ngominhduc2705@gmail.com"
+    },
+    {
+      "id": 9,
+      "name": "Ngô Minh Đức",
+      "email": "admin@gmail.com",
+      "isActive": false
+    },
+    {
+      "id": 10,
+      "name": "Ngô Minh Đức",
+      "email": "admin@gmail.com",
+      "isActive": false
+    }
+  ]
+}
